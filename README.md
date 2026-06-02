@@ -2,7 +2,7 @@
 
 # ToonTalk AI - A Cartoon AI Simulation World
 
-**English** | [简体中文 (README.md)](README.md)
+**English** | [简体中文 (README_zh.md)](README_zh.md)
 
 [![Next.js Version](https://img.shields.io/badge/Next.js-14.2.3-black.svg?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
 [![React Version](https://img.shields.io/badge/React-18.3.1-blue.svg?style=flat-square&logo=react)](https://react.dev/)
@@ -83,7 +83,7 @@ ToonTalk AI is designed with a modern, full-stack architecture optimized for loc
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/toontalk-ai.git
+   git clone https://github.com/GoldBean216/toontalk-ai.git
    cd toontalk-ai
    ```
 
@@ -130,9 +130,9 @@ ToonTalk AI is an open-source project. We highly encourage contributions from de
 Have any questions, ideas, or feedback? Get in touch with us:
 
 1. **GitHub Issues** (Recommended):
-   - For bugs, feature requests, or technical errors, please open a ticket on our [Issues Page](https://github.com/your-username/toontalk-ai/issues).
+   - For bugs, feature requests, or technical errors, please open a ticket on our [Issues Page](https://github.com/GoldBean216/toontalk-ai/issues).
 2. **Pull Requests**:
-   - Submit code additions directly via [PRs](https://github.com/your-username/toontalk-ai/pulls).
+   - Submit code additions directly via [PRs](https://github.com/GoldBean216/toontalk-ai/pulls).
 3. **Discussions (GitHub Discussions)**:
    - Participate in general chat, character setup sharing, and community ideas on the Discussions tab.
 4. **Community Contacts**:
