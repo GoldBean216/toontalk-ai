@@ -1,0 +1,7 @@
+{
+  "name": "ToonTalk - Chat with Everything",
+  "description": "A cartoon-styled WhatsApp clone where you chat with anything but humans. Cats, toasters, trees—they all have voices and personalities.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

@@ -1,0 +1,432 @@
+{
+  "buildings": [
+    {
+      "id": "hq",
+      "name": "🏢 TOONTALK HQ",
+      "type": "office",
+      "x": -480,
+      "y": -400,
+      "width": 200,
+      "height": 240,
+      "emoji": "🏢",
+      "description": "Main research lab and team workstation.",
+      "tag": "WORKSTATION",
+      "actionText": "View Office 💻",
+      "functions": [
+        {
+          "id": "hq-news",
+          "name": "News Collection",
+          "type": "skill",
+          "skillId": "wise_mentor",
+          "description": "Collects latest news and industry updates.",
+          "assigneeId": "Edison"
+        }
+      ]
+    },
+    {
+      "id": "cafe",
+      "name": "☕ TOON CAFÉ",
+      "type": "shop",
+      "x": 320,
+      "y": -360,
+      "width": 180,
+      "height": 220,
+      "emoji": "🥐",
+      "description": "Premium roasted coffee & croissants.",
+      "tag": "BREW",
+      "actionText": "Enter Café ☕",
+      "functions": [
+        {
+          "id": "cafe-coupons",
+          "name": "Coupon System",
+          "type": "skill",
+          "skillId": "storyteller",
+          "description": "Distributes daily coupons and tracks queueing.",
+          "assigneeId": "Mittens"
+        }
+      ]
+    },
+    {
+      "id": "gym",
+      "name": "💪 POWER GYM",
+      "type": "training",
+      "x": -320,
+      "y": 200,
+      "width": 180,
+      "height": 180,
+      "emoji": "🏃",
+      "description": "High-intensity fitness center.",
+      "tag": "FITNESS",
+      "actionText": "Train Here 🏋️"
+    },
+    {
+      "id": "plaza",
+      "name": "⛲ FOUNTAIN PLAZA",
+      "type": "park",
+      "x": 0,
+      "y": -40,
+      "width": 220,
+      "height": 200,
+      "emoji": "🌳",
+      "description": "A beautiful public park and fountain.",
+      "tag": "RELAX",
+      "actionText": "Stroll Park ⛲"
+    },
+    {
+      "id": "cinema",
+      "name": "🎬 TOON CINEMA",
+      "type": "entertainment",
+      "x": 320,
+      "y": 240,
+      "width": 180,
+      "height": 180,
+      "emoji": "🎟️",
+      "description": "3D movies and classic animation theatres.",
+      "tag": "CINEMA",
+      "actionText": "Watch Movie 🎬",
+      "functions": [
+        {
+          "id": "cinema-shows",
+          "name": "Showtimes Info",
+          "type": "info",
+          "description": "Displays current and upcoming movie showtimes."
+        }
+      ]
+    },
+    {
+      "id": "arcade",
+      "name": "🎮 ARCADE ZONE",
+      "type": "entertainment",
+      "x": 80,
+      "y": 440,
+      "width": 180,
+      "height": 200,
+      "emoji": "🕹️",
+      "description": "Retro game consoles and pinball machines.",
+      "tag": "GAMES",
+      "actionText": "Play Games 🎮"
+    },
+    {
+      "id": "library",
+      "name": "📚 TOON LIBRARY",
+      "type": "education",
+      "x": -800,
+      "y": -560,
+      "width": 200,
+      "height": 220,
+      "emoji": "🏫",
+      "description": "Silent study zones and research manuals.",
+      "tag": "STUDY",
+      "actionText": "Read Books 📚"
+    },
+    {
+      "id": "store",
+      "name": "🏪 24/7 MART",
+      "type": "shop",
+      "x": 800,
+      "y": -440,
+      "width": 180,
+      "height": 180,
+      "emoji": "🍱",
+      "description": "Convenience snacks and dynamic energy drinks.",
+      "tag": "SHOP",
+      "actionText": "Buy Snacks 🏪"
+    },
+    {
+      "id": "boba",
+      "name": "🧋 BOBA STREET",
+      "type": "shop",
+      "x": -120,
+      "y": 720,
+      "width": 160,
+      "height": 200,
+      "emoji": "🍪",
+      "description": "Famous sweet bubble tea shop.",
+      "tag": "BOBA",
+      "actionText": "Order Boba 🧋"
+    },
+    {
+      "id": "lake",
+      "name": "🌊 TOON LAKE",
+      "type": "lake",
+      "x": 1040,
+      "y": -40,
+      "width": 240,
+      "height": 200,
+      "emoji": "🎣",
+      "description": "A deep blue cartoon lake, perfect for fishing.",
+      "tag": "LAKE",
+      "actionText": "Go Fishing 🎣"
+    },
+    {
+      "id": "mountain",
+      "name": "⛰️ TOON MOUNTAIN",
+      "type": "mountain",
+      "x": -1000,
+      "y": -80,
+      "width": 200,
+      "height": 220,
+      "emoji": "🧗",
+      "description": "A soaring peak with hiking trails and scenic views.",
+      "tag": "MOUNTAIN",
+      "actionText": "Climb Peak 🧗"
+    },
+    {
+      "id": "pond",
+      "name": "🐸 TOON POND",
+      "type": "pond",
+      "x": -760,
+      "y": 760,
+      "width": 160,
+      "height": 160,
+      "emoji": "🐸",
+      "description": "A quiet lily pad pond where small frogs splash.",
+      "tag": "POND",
+      "actionText": "Catch Tadpoles 🐸"
+    },
+    {
+      "id": "b_1779801774208",
+      "name": "🏪 24/7 MART",
+      "type": "shop",
+      "x": 400,
+      "y": 440,
+      "width": 180,
+      "height": 180,
+      "emoji": "🍱",
+      "description": "Convenience snack store.",
+      "tag": "SHOP",
+      "actionText": "Interact 🔍"
+    },
+    {
+      "id": "b_1779801784798",
+      "name": "🧋 BOBA STREET",
+      "type": "shop",
+      "x": 800,
+      "y": 400,
+      "width": 160,
+      "height": 200,
+      "emoji": "🍪",
+      "description": "Bubble milk tea stall.",
+      "tag": "BOBA",
+      "actionText": "Interact 🔍"
+    },
+    {
+      "id": "b_1779802223120",
+      "name": "🍦 Ice Cream Parlor",
+      "type": "shop",
+      "x": -800,
+      "y": 240,
+      "width": 140,
+      "height": 160,
+      "emoji": "🍦",
+      "description": "Delicious frozen treats.",
+      "tag": "SWEET",
+      "actionText": "Interact 🔍"
+    },
+    {
+      "id": "b_1779802236626",
+      "name": "🏡 Toon Villa",
+      "type": "home",
+      "x": 760,
+      "y": -760,
+      "width": 160,
+      "height": 160,
+      "emoji": "🏡",
+      "description": "A cozy house for cartoon toons.",
+      "tag": "VILLA",
+      "actionText": "Interact 🔍"
+    },
+    {
+      "id": "b_1779802260102",
+      "name": "🍭 Candy Shop",
+      "type": "shop",
+      "x": -600,
+      "y": -1000,
+      "width": 140,
+      "height": 160,
+      "emoji": "🍭",
+      "description": "Jellybeans and lollipops.",
+      "tag": "CANDY",
+      "actionText": "Interact 🔍"
+    },
+    {
+      "id": "b_1779804417078_A",
+      "name": "🚇 METRO STATION A",
+      "type": "transit",
+      "x": 680,
+      "y": 80,
+      "width": 180,
+      "height": 180,
+      "emoji": "🎫",
+      "description": "Metro subway gateway.",
+      "tag": "TRANSIT",
+      "actionText": "Interact 🔍",
+      "linkedMetroId": "b_1779804417078_B"
+    },
+    {
+      "id": "b_1779804417078_B",
+      "name": "🚇 METRO STATION B",
+      "type": "transit",
+      "x": -600,
+      "y": 80,
+      "width": 180,
+      "height": 180,
+      "emoji": "🎫",
+      "description": "Metro subway gateway.",
+      "tag": "TRANSIT",
+      "actionText": "Interact 🔍",
+      "linkedMetroId": "b_1779804417078_A"
+    },
+    {
+      "id": "b_1779805821987_A",
+      "name": "🚇 METRO STATION A",
+      "type": "transit",
+      "x": 120,
+      "y": -760,
+      "width": 180,
+      "height": 180,
+      "emoji": "🎫",
+      "description": "Metro subway gateway.",
+      "tag": "TRANSIT",
+      "actionText": "Interact 🔍",
+      "linkedMetroId": "b_1779805821987_B"
+    },
+    {
+      "id": "b_1779805821987_B",
+      "name": "🚇 METRO STATION B",
+      "type": "transit",
+      "x": 120,
+      "y": 720,
+      "width": 180,
+      "height": 180,
+      "emoji": "🎫",
+      "description": "Metro subway gateway.",
+      "tag": "TRANSIT",
+      "actionText": "Interact 🔍",
+      "linkedMetroId": "b_1779805821987_A"
+    },
+    {
+      "id": "b_1779805842090_A",
+      "name": "🚇 METRO STATION A",
+      "type": "transit",
+      "x": 760,
+      "y": 680,
+      "width": 180,
+      "height": 180,
+      "emoji": "🎫",
+      "description": "Metro subway gateway.",
+      "tag": "TRANSIT",
+      "actionText": "Interact 🔍",
+      "linkedMetroId": "b_1779805842090_B"
+    },
+    {
+      "id": "b_1779805842090_B",
+      "name": "🚇 METRO STATION B",
+      "type": "transit",
+      "x": -720,
+      "y": -760,
+      "width": 180,
+      "height": 180,
+      "emoji": "🎫",
+      "description": "Metro subway gateway.",
+      "tag": "TRANSIT",
+      "actionText": "Interact 🔍",
+      "linkedMetroId": "b_1779805842090_A"
+    },
+    {
+      "id": "hospital",
+      "name": "🏥 TOON HOSPITAL",
+      "type": "hospital",
+      "x": -400,
+      "y": 360,
+      "width": 180,
+      "height": 200,
+      "emoji": "🏥",
+      "description": "Medical care and healing center for sick toons.",
+      "tag": "MEDICAL",
+      "actionText": "Visit Hospital 🏥"
+    }
+  ],
+  "streets": [
+    {
+      "id": "h_outer_top",
+      "type": "h",
+      "coord": -880,
+      "start": -880,
+      "end": 880,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "h_outer_bottom",
+      "type": "h",
+      "coord": 880,
+      "start": -880,
+      "end": 880,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "h_inner_top",
+      "type": "h",
+      "coord": -400,
+      "start": -400,
+      "end": 400,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "h_inner_bottom",
+      "type": "h",
+      "coord": 400,
+      "start": -400,
+      "end": 400,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "h_center_cross",
+      "type": "h",
+      "coord": 0,
+      "start": -880,
+      "end": 880,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "v_outer_left",
+      "type": "v",
+      "coord": -880,
+      "start": -880,
+      "end": 880,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "v_outer_right",
+      "type": "v",
+      "coord": 880,
+      "start": -880,
+      "end": 880,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "v_inner_left",
+      "type": "v",
+      "coord": -400,
+      "start": -400,
+      "end": 400,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "v_inner_right",
+      "type": "v",
+      "coord": 400,
+      "start": -400,
+      "end": 400,
+      "roadStyle": "two-lane"
+    },
+    {
+      "id": "v_center_cross",
+      "type": "v",
+      "coord": 0,
+      "start": -880,
+      "end": 880,
+      "roadStyle": "two-lane"
+    }
+  ]
+}
