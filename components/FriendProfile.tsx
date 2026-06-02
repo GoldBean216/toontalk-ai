@@ -700,8 +700,14 @@ export const FriendProfile: React.FC<FriendProfileProps> = ({
                             ) : (
                                 <div className="grid grid-cols-3 gap-3">
                                     {myItems.map((item, idx) => {
-                                        // Check compatibility
-                                        const isCompatible = !item.targetSpecies || item.targetSpecies === 'All' || item.targetSpecies === contact.species;
+                                        // Check compatibility (case-insensitive, handles 'any'/'all', and matches list of species)
+                                        const isCompatible = (() => {
+                                            if (!item.targetSpecies) return true;
+                                            const target = item.targetSpecies.toLowerCase();
+                                            if (target === 'all' || target === 'any') return true;
+                                            const contactSpecies = (contact.species || '').toLowerCase();
+                                            return target.includes(contactSpecies);
+                                        })();
 
                                         return (
                                             <div
