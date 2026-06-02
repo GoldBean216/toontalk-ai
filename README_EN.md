@@ -79,7 +79,6 @@ ToonTalk AI is designed with a modern, full-stack architecture optimized for loc
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) installed (v18+ or v20+ recommended)
-- A [Google AI Studio Gemini API Key](https://aistudio.google.com/)
 
 ### Steps
 
@@ -94,26 +93,19 @@ ToonTalk AI is designed with a modern, full-stack architecture optimized for loc
    npm install
    ```
 
-3. **Configure Environment Variables**
-   Copy the example environment template to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-   Open `.env.local` and enter your Gemini API key:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
+3. **Database Auto-Migration (Zero Config)**
+   ToonTalk AI uses a local SQLite database (`local.db`). On running the development server for the first time, a `local.db` will be **automatically created and seeded** with default characters, initial items, and mock social feed posts.
 
-4. **Database Auto-Migration**
-   ToonTalk AI uses a local SQLite database (`local.db`).
-   - **Zero Config**: On running the development server for the first time, a `local.db` will be **automatically created and seeded** with default characters, initial items, and mock social feed posts.
-   - **Custom Migration**: Refer to `chat_schema.sql` and the `migrations/` folder for schema setups if migrating database environments.
-
-5. **Start Dev Server**
+4. **Start Dev Server**
    ```bash
    npm run dev
    ```
    Open your browser to [http://localhost:3000](http://localhost:3000) to enter the toon world!
+
+### 💡 API Key Configuration (Optional)
+This project **does not require any local environment variables** to start!
+- **In-App Configuration**: After running the project, you can input your Gemini/OpenAI/DeepSeek API keys directly in the UI. Open any character's **Friend Profile -> Brain settings (gear icon)** and enter the API key.
+- **Environment Variables (Optional)**: If you prefer to use a single global key for all characters, you can copy the `.env.example` template to `.env.local` and set `GEMINI_API_KEY=your_key_here`.
 
 ---
 
