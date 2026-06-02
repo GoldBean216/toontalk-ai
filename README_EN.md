@@ -137,6 +137,7 @@ Have any questions, ideas, or feedback? Get in touch with us:
 3. **Discussions (GitHub Discussions)**:
    - Participate in general chat, character setup sharing, and community ideas on the Discussions tab.
 4. **Community Contacts**:
+   - **X (Twitter)**: [@chriszheng2026](https://x.com/chriszheng2026) 🐦
    - **Discord Community**: [Join our Discord Server](https://discord.gg/bwqXMzCGG) 💬
    - **Reddit Community**: [r/LetToonTalk](https://www.reddit.com/r/LetToonTalk) 🚀
 
