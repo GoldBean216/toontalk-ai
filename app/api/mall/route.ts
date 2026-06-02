@@ -66,7 +66,14 @@ export async function POST(req: NextRequest) {
         }
 
         const newCoins = profile.coins - totalCost;
-        const currentInventory = profile.inventory || [];
+        let currentInventory = profile.inventory || [];
+        if (typeof currentInventory === 'string') {
+            try {
+                currentInventory = JSON.parse(currentInventory);
+            } catch (e) {
+                currentInventory = [];
+            }
+        }
         const newInventory = Array.from(new Set([...currentInventory, ...productIds]));
 
         const { error: updateError } = await supabase

@@ -1524,6 +1524,8 @@ const App: React.FC = () => {
         const freshContact = contacts.find(c => c.id === contactId) || (activeContact && activeContact.id === contactId ? activeContact : miniChatContact);
         if (!freshContact) return;
 
+        const newMessages: Message[] = [];
+
         // Handle gift/heart energy restoration
         if (type === 'gift') {
             const updatedContact = restoreEnergy(freshContact, 'gift');
@@ -1538,7 +1540,7 @@ const App: React.FC = () => {
                 isAudio: false,
                 isTranslated: true
             };
-            setAllMessages(prev => ({ ...prev, [contactId]: [...(prev[contactId] || []), systemMsg] }));
+            newMessages.push(systemMsg);
         }
 
         // Check AI energy before responding
@@ -1555,7 +1557,7 @@ const App: React.FC = () => {
                 isAudio: false,
                 isTranslated: true
             };
-            setAllMessages(prev => ({ ...prev, [contactId]: [...(prev[contactId] || []), systemMsg] }));
+            newMessages.push(systemMsg);
         }
 
         // Check token usage warning
@@ -1569,16 +1571,17 @@ const App: React.FC = () => {
                 isAudio: false,
                 isTranslated: true
             };
-            setAllMessages(prev => ({ ...prev, [contactId]: [...(prev[contactId] || []), systemMsg] }));
+            newMessages.push(systemMsg);
         }
 
         const userMsg: Message = {
             id: Date.now().toString(), senderId: 'user', text, timestamp: Date.now(),
             isAudio: false, isTranslated: true, type, gameData, giftData
         };
+        newMessages.push(userMsg);
 
-        // 1. Optimistic UI Update
-        setAllMessages(prev => ({ ...prev, [contactId]: [...(prev[contactId] || []), userMsg] }));
+        // 1. Optimistic UI Update (Single update to avoid React state batching overwrite)
+        setAllMessages(prev => ({ ...prev, [contactId]: [...(prev[contactId] || []), ...newMessages] }));
 
         // 2. Persist Locally (Local Only)
         if (authUser?.id) {
@@ -1586,10 +1589,10 @@ const App: React.FC = () => {
         }
 
         // AI Reply logic
-        // AI Reply logic
-        if (type === 'text' || type === 'game') {
-            // Check if AI is too tired to respond
-            if (isCriticallyTired(regeneratedContact)) {
+        if (type === 'text' || type === 'game' || type === 'gift') {
+            // Check if AI is too tired to respond (use post-gift energy level if it was a gift)
+            const checkContact = type === 'gift' ? restoreEnergy(regeneratedContact, 'gift') : regeneratedContact;
+            if (isCriticallyTired(checkContact)) {
                 const tiredMsg: Message = {
                     id: (Date.now() + 1).toString(),
                     senderId: contactId,
@@ -1605,11 +1608,13 @@ const App: React.FC = () => {
                 return;
             }
 
-            // --- IMMEDIATE AI GAME PLAY ---
+            // --- IMMEDIATE AI GAME PLAY / GIFT HANDLING ---
             let promptText = text;
             let aiGameMsg: Message | null = null;
 
-            if (type === 'game' && gameData) {
+            if (type === 'gift' && giftData) {
+                promptText = `[SYSTEM: User sent you a gift: "${giftData.productName}". React to this gift in character with absolute delight, thank the user warmly, and mention how it makes you feel energized!]`;
+            } else if (type === 'game' && gameData) {
                 let aiMove = '';
                 if (gameData.type === 'dice' || gameData.type === 'wheel') {
                     aiMove = (Math.floor(Math.random() * 6) + 1).toString();
@@ -2217,15 +2222,35 @@ const App: React.FC = () => {
                             onSendGift={(pid) => {
                                 const product = allProducts.find(p => p.id === pid);
                                 if (product) {
-                                    const hasItem = user.inventory.includes(pid);
+                                    let userInventory = user.inventory || [];
+                                    if (typeof userInventory === 'string') {
+                                        try {
+                                            userInventory = JSON.parse(userInventory);
+                                        } catch (e) {
+                                            userInventory = [];
+                                        }
+                                    }
+                                    const hasItem = userInventory.includes(pid);
                                     if (hasItem) {
                                         // Deduct from inventory
-                                        updateUserData(prev => ({
-                                            ...prev,
-                                            inventory: prev.inventory.filter(id => id !== pid)
-                                        }));
+                                        updateUserData(prev => {
+                                            let prevInv = prev.inventory || [];
+                                            if (typeof prevInv === 'string') {
+                                                try {
+                                                    prevInv = JSON.parse(prevInv);
+                                                } catch (e) {
+                                                    prevInv = [];
+                                                }
+                                            }
+                                            return {
+                                                ...prev,
+                                                inventory: prevInv.filter(id => id !== pid)
+                                            };
+                                        });
                                         updateAffinity(activeContact.id, 5);
                                         handleUserSendMessage("Sent a gift", 'gift', undefined, { productName: product.name, imageUrl: product.imageUrl });
+                                    } else {
+                                        alert(language === '简体中文' ? '您没有此物品，请前往商场购买！' : 'You do not own this item. Buy it at the Mall!');
                                     }
                                 }
                             }}
@@ -2264,14 +2289,32 @@ const App: React.FC = () => {
                                 const product = allProducts.find(p => p.id === pid);
                                 if (!product) return { success: false, message: language === '简体中文' ? '未找到该物品' : 'Item not found' };
                                 
-                                const hasItem = user.inventory.includes(pid);
+                                let userInventory = user.inventory || [];
+                                if (typeof userInventory === 'string') {
+                                    try {
+                                        userInventory = JSON.parse(userInventory);
+                                    } catch (e) {
+                                        userInventory = [];
+                                    }
+                                }
+                                const hasItem = userInventory.includes(pid);
                                 if (!hasItem) return { success: false, message: language === '简体中文' ? '你还没有这个物品，去商场购买吧！' : 'You do not own this item. Buy it at the Mall!' };
 
                                 // Deduct from inventory
-                                updateUserData(prev => ({
-                                    ...prev,
-                                    inventory: prev.inventory.filter(id => id !== pid)
-                                }));
+                                updateUserData(prev => {
+                                    let prevInv = prev.inventory || [];
+                                    if (typeof prevInv === 'string') {
+                                        try {
+                                            prevInv = JSON.parse(prevInv);
+                                        } catch (e) {
+                                            prevInv = [];
+                                        }
+                                    }
+                                    return {
+                                        ...prev,
+                                        inventory: prevInv.filter(id => id !== pid)
+                                    };
+                                });
 
                                 // Update affinity
                                 updateAffinity(viewingFriend.id, 5);
