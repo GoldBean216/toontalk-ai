@@ -57,8 +57,6 @@ export function useAISimulation({
     const buildingsRef = useRef(buildings);
     const onBuildingsUpdateRef = useRef(onBuildingsUpdate);
     const onBuildingVisitedRef = useRef(onBuildingVisited);
-    // Ref to triggerBuildingGeneration so the interval always calls the latest version (fixes stale closure)
-    const triggerBuildingGenerationRef = useRef<(b: MapBuilding) => Promise<void>>(() => Promise.resolve());
     
     useEffect(() => {
         buildingsRef.current = buildings;
@@ -118,123 +116,7 @@ export function useAISimulation({
         if (!isLoaded) loadInstalledSkills();
     }, [isLoaded, loadInstalledSkills]);
 
-    const triggerBuildingGeneration = async (b: MapBuilding) => {
-        console.log(`[Simulation] Building ${b.name} triggering generation...`);
-        try {
-            // If there's a manager, check their energy
-            if (b.managerId) {
-                const manager = contacts.find(c => c.id === b.managerId);
-                if (manager) {
-                    const currentEnergy = manager.energy !== undefined ? manager.energy : 100;
-                    if (currentEnergy <= 10) {
-                        console.log(`[Simulation] Manager ${manager.name} is too tired (${currentEnergy} energy) to generate content.`);
-                        return;
-                    }
-                }
-            }
 
-            // Find skill prompt if it's a skill
-            const skillId = b.basicFunction;
-            const skill = [...PRESET_SKILLS, ...installedSkills].find(s => s.id === skillId);
-            const skillPrompt = skill?.handlerPrompt;
-
-            // ── Brain config resolution ────────────────────────────────────────
-            let managerBrain: any = undefined;
-            if (b.managerId) {
-                const manager = contacts.find(c => c.id === b.managerId);
-                if (manager?.aiBrain?.apiKey) {
-                    managerBrain = manager.aiBrain;
-                    console.log(`[BuildingGen] Brain from contacts[].aiBrain: hasKey=true`);
-                } else if (typeof window !== 'undefined') {
-                    const allBrainKeys = Object.keys(localStorage).filter(k => k.startsWith('toontalk_brain_'));
-                    console.log(`[BuildingGen] All brain keys in localStorage:`, allBrainKeys);
-                    console.log(`[BuildingGen] Looking for managerId=${b.managerId} userId=${user?.id} stableId=${manager?.stableId}`);
-                    const keysToTry = [
-                        user?.id ? `toontalk_brain_${user.id}_${b.managerId}` : null,
-                        `toontalk_brain_${b.managerId}`,
-                        manager?.stableId && manager.stableId !== b.managerId && user?.id ? `toontalk_brain_${user.id}_${manager.stableId}` : null,
-                        manager?.stableId && manager.stableId !== b.managerId ? `toontalk_brain_${manager.stableId}` : null,
-                    ].filter(Boolean) as string[];
-                    for (const key of keysToTry) {
-                        const stored = localStorage.getItem(key);
-                        if (stored) {
-                            try { const p = JSON.parse(stored); if (p?.apiKey || p?.provider) { managerBrain = p; console.log(`[BuildingGen] Brain at key "${key}"`); break; } } catch (_) {}
-                        }
-                    }
-                    if (!managerBrain) console.warn(`[BuildingGen] Brain NOT found. Tried:`, keysToTry);
-                }
-            }
-
-            let globalBrain: any = null;
-            if (typeof window !== 'undefined') {
-                const globalKey = user?.id ? `toontalk_global_ai_${user.id}` : 'toontalk_global_ai';
-                const storedGlobal = localStorage.getItem(globalKey);
-                if (storedGlobal) {
-                    try { globalBrain = JSON.parse(storedGlobal); } catch (_) {}
-                }
-            }
-
-            const effectiveManagerBrain = getEffectiveBrainConfig(managerBrain, globalBrain);
-
-            const res = await fetch('/api/ai/building-function-trigger', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    buildingId: b.id, buildingName: b.name, managerId: b.managerId,
-                    basicFunction: b.basicFunction, skillPrompt,
-                    brain: effectiveManagerBrain, userId: user?.id, language
-                })
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                if (data.content && onBuildingsUpdateRef.current) {
-                    const updatedBuildings = buildingsRef.current.map(u => {
-                        if (u.id === b.id) {
-                            const contents = u.generatedContents || [];
-                            return { 
-                                ...u, 
-                                generatedContents: [data.content, ...contents].slice(0, 10),
-                                lastGenerationTime: Date.now()
-                            };
-                        }
-                        return u;
-                    });
-                    onBuildingsUpdateRef.current(updatedBuildings);
-
-                    // Deduct 10 energy from the manager for producing content
-                    if (b.managerId && onUpdateContactEnergy) {
-                        const manager = contacts.find(c => c.id === b.managerId);
-                        if (manager) {
-                            const currentEnergy = manager.energy !== undefined ? manager.energy : 100;
-                            const newEnergy = Math.max(0, currentEnergy - 10);
-                            onUpdateContactEnergy(b.managerId, newEnergy);
-                        }
-                    }
-
-                    // Record Event
-                    eventService.addEvent({
-                        type: 'PRODUCTION',
-                        characters: [b.managerId || 'system'],
-                        location: b.id,
-                        metadata: {
-                            buildingName: b.name,
-                            buildingType: b.type,
-                            contentId: data.content.id,
-                            contentMarkdown: data.content.markdown
-                        }
-                    });
-                }
-            }
-        } catch (e) {
-            console.error("[BuildingGen] Failed to trigger building generation:", e);
-        }
-    };
-
-    // Always keep the ref up-to-date so the interval calls the latest version
-    useEffect(() => {
-        triggerBuildingGenerationRef.current = triggerBuildingGeneration;
-    });
 
     const triggerReaction = async (c: Contact, b: MapBuilding) => {
         if (!b.generatedContents || b.generatedContents.length === 0) return;
@@ -1081,27 +963,7 @@ export function useAISimulation({
         return () => clearInterval(interval);
     }, [roadGrid, language, user, weatherRef, gameHourRef, hoveredContactIdRef]);
 
-    // 3. Building Generation Loop (10s timer)
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const now = Date.now();
-            const activeBuildings = buildingsRef.current.filter(
-                b => b.isActive && b.managerId && b.generationFrequency > 0
-            );
-            console.log(`[BuildingGen] Tick — ${activeBuildings.length} active buildings with managers`);
-            activeBuildings.forEach(b => {
-                const lastGen = lastGenerationTimesRef.current[b.id] || 0;
-                const freqMs = b.generationFrequency * 60 * 1000; // frequency in real minutes
-                const elapsed = now - lastGen;
-                console.log(`[BuildingGen] ${b.name}: lastGen=${lastGen ? Math.round(elapsed/1000)+'s ago' : 'never'}, freqMs=${freqMs/1000}s, willTrigger=${elapsed >= freqMs}`);
-                if (elapsed >= freqMs) {
-                    lastGenerationTimesRef.current[b.id] = now;
-                    triggerBuildingGenerationRef.current(b); // ← always latest version via ref
-                }
-            });
-        }, 10000);
-        return () => clearInterval(interval);
-    }, []);
+
 
     // 3.5 Load Persisted Building Contents on Mount/Update
     const loadedPersistedRef = useRef<Record<string, boolean>>({});

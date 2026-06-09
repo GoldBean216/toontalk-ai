@@ -36,6 +36,7 @@ export const ToonMap: React.FC<ToonMapProps> = ({
     contacts,
     onBack,
     onChat,
+    onOpenBuildingChat,
     onViewHighNotes,
     onSimulationStateUpdate,
     onWeatherUpdate,
@@ -57,6 +58,7 @@ export const ToonMap: React.FC<ToonMapProps> = ({
     const t = MAP_TRANSLATIONS[language as keyof typeof MAP_TRANSLATIONS] || MAP_TRANSLATIONS.English;
 
     const [showNews, setShowNews] = React.useState(false);
+    const [confirmEnterBuilding, setConfirmEnterBuilding] = React.useState<MapBuilding | null>(null);
 
     // 1. Core Map States (Buildings, Streets, Weather, Time, Tasks, Selection)
     const mapState = useMapState({
@@ -187,6 +189,10 @@ export const ToonMap: React.FC<ToonMapProps> = ({
     };
 
     const handleSelectBuilding = (b: MapBuilding) => {
+        if (b.isActive && b.managerId) {
+            setConfirmEnterBuilding(b);
+            return;
+        }
         mapState.setSelectedContact(null);
         mapState.setSelectedBuilding(b);
         cameraControls.setPan({ x: -b.x, y: -b.y });
@@ -447,6 +453,7 @@ export const ToonMap: React.FC<ToonMapProps> = ({
                     onOpenMall={onOpenMall}
                     onOpenSkillMall={onOpenSkillMall}
                     userId={user?.id}
+                    onOpenBuildingChat={onOpenBuildingChat}
                 />
             )}
 
@@ -543,6 +550,40 @@ export const ToonMap: React.FC<ToonMapProps> = ({
                     onClose={() => setShowNews(false)}
                     contacts={contacts}
                 />
+            )}
+
+            {/* Confirm Enter Building Dialog */}
+            {confirmEnterBuilding && (
+                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white border-4 border-black rounded-3xl w-full max-w-sm p-6 shadow-[8px_8px_0px_rgba(0,0,0,1)] text-center animate-scaleUp">
+                        <div className="text-4xl mb-4">🚪</div>
+                        <h3 className="text-xl font-black mb-2 uppercase tracking-wide">
+                            {language === "简体中文" ? "进入建筑？" : "Enter Building?"}
+                        </h3>
+                        <p className="text-sm font-bold text-slate-600 mb-6">
+                            {language === "简体中文" 
+                                ? `是否进入 ${confirmEnterBuilding.name} 与负责人 ${contacts.find(c => c.id === confirmEnterBuilding.managerId)?.name || 'AI'} 开启对话？` 
+                                : `Would you like to enter ${confirmEnterBuilding.name} and chat with the manager?`}
+                        </p>
+                        <div className="flex gap-4 justify-center">
+                            <button 
+                                onClick={() => setConfirmEnterBuilding(null)}
+                                className="bg-slate-200 hover:bg-slate-300 border-2 border-black px-5 py-2.5 rounded-xl font-black text-sm shadow-[2px_2px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none transition-all"
+                            >
+                                {language === "简体中文" ? "取消" : "Cancel"}
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    if (onOpenBuildingChat) onOpenBuildingChat(confirmEnterBuilding);
+                                    setConfirmEnterBuilding(null);
+                                }}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white border-2 border-black px-6 py-2.5 rounded-xl font-black text-sm shadow-[2px_2px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none transition-all"
+                            >
+                                {language === "简体中文" ? "进入" : "Enter"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

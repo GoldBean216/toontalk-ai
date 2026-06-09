@@ -11,6 +11,32 @@ export interface MapBuildingContent {
   comments: any[];
 }
 
+export interface CustomDecorNode {
+  id: string;
+  type: 'decor' | 'image' | 'video' | 'gif';
+  label: string;
+  icon: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  url?: string;
+  zIndex?: number;
+  aiReachable?: boolean;
+}
+
+export interface CustomPath {
+  id: string;
+  fromId: string;
+  toId: string;
+}
+
+export interface RenovatedLayout {
+  nodes: CustomDecorNode[];
+  paths: CustomPath[];
+}
+
 export interface MapBuilding {
   id: string;
   name: string;
@@ -36,6 +62,11 @@ export interface MapBuilding {
   lastGenerationTime?: number;
   linkedMetroId?: string;
   coins?: number;
+  chatBgImage?: string;
+  chatBgOpacity?: number;
+  chatMessageBgOpacity?: number;
+  chatMessageBlur?: number;
+  renovatedLayout?: RenovatedLayout;
 }
 
 export interface MapBuildingFunction {
@@ -87,6 +118,7 @@ export interface ToonMapProps {
   contacts: Contact[];
   onBack: () => void;
   onChat: (contact: Contact) => void;
+  onOpenBuildingChat?: (building: MapBuilding) => void;
   onViewHighNotes?: (contact: Contact) => void;
   onSimulationStateUpdate?: (state: Record<string, any>) => void;
   onWeatherUpdate?: (weather: string) => void;

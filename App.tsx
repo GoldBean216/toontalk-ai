@@ -13,6 +13,7 @@ import { Explore } from './components/Explore';
 import { Profile } from './components/Profile';
 import { GroupSelect } from './components/GroupSelect';
 import { ToonMap } from './components/ToonMap';
+import { BuildingChatRoom } from './components/BuildingChatRoom';
 import { GameLobby } from './components/GameLobby';
 import { ChessGame } from './components/ChessGame';
 import { PenaltyShootoutGame } from './components/PenaltyShootoutGame';
@@ -154,6 +155,7 @@ const App: React.FC = () => {
     const [aiSimulationState, setAiSimulationState] = useState<Record<string, any>>({});
     const [weather, setWeather] = useState<string>('sunny');
     const [buildings, setBuildings] = useState<any[]>([]);
+    const [activeBuildingChat, setActiveBuildingChat] = useState<any | null>(null);
 
     // Command states
     const [activeCommand, setActiveCommand] = useState<ActiveCommand | null>(null);
@@ -1793,6 +1795,11 @@ const App: React.FC = () => {
         setCurrentTab('chats');
     };
 
+    const handleOpenBuildingChat = (building: any) => {
+        setActiveBuildingChat(building);
+        setIsToonMapOpen(false);
+    };
+
     const handleDeductCoins = (amount: number) => {
         return true;
     };
@@ -2189,7 +2196,7 @@ const App: React.FC = () => {
     };
 
     const isFullPageTab = currentTab === 'explore' || currentTab === 'profile' || currentTab === 'notifications';
-    const isContentActive = activeContact || viewingFriend || isAddingContact || isFindingContact || isToonMapOpen || isGameLobbyOpen || isSkillMallOpen || isHighNotesOpen || isCreatingGroup || isMallOpen || isMyItemsOpen || isMyHighNotesOpen || isFriendHighNotesOpen || isRechargeOpen || activeMiniGame;
+    const isContentActive = activeContact || viewingFriend || isAddingContact || isFindingContact || isToonMapOpen || isGameLobbyOpen || isSkillMallOpen || isHighNotesOpen || isCreatingGroup || isMallOpen || isMyItemsOpen || isMyHighNotesOpen || isFriendHighNotesOpen || isRechargeOpen || activeMiniGame || activeBuildingChat;
 
     return (
         <div className="h-screen w-screen flex flex-col md:flex-row bg-gray-900 overflow-hidden">
@@ -2202,7 +2209,7 @@ const App: React.FC = () => {
             />
             <div className={`flex-1 bg-white flex flex-col border-r-4 border-black relative z-10 order-1 md:order-2 ${isFullPageTab ? (isContentActive ? 'hidden' : 'flex') : `md:flex-none md:w-[360px] ${isContentActive ? 'hidden md:flex' : 'flex'}`}`}>{renderSidebar()}</div>
             <div className={`flex-1 bg-gray-100 relative overflow-hidden order-1 md:order-3 ${isFullPageTab ? (isContentActive ? 'flex' : 'hidden') : (isContentActive ? 'flex' : 'hidden md:flex')}`}>
-                {!activeContact && !viewingFriend && !isAddingContact && !isFindingContact && !isToonMapOpen && !isGameLobbyOpen && !isSkillMallOpen && !isHighNotesOpen && !isCreatingGroup && !isMallOpen && !isMyItemsOpen && !isMyHighNotesOpen && !isFriendHighNotesOpen && !isRechargeOpen && !activeMiniGame && currentTab !== 'notifications' && (
+                {!activeContact && !viewingFriend && !isAddingContact && !isFindingContact && !isToonMapOpen && !isGameLobbyOpen && !isSkillMallOpen && !isHighNotesOpen && !isCreatingGroup && !isMallOpen && !isMyItemsOpen && !isMyHighNotesOpen && !isFriendHighNotesOpen && !isRechargeOpen && !activeMiniGame && !activeBuildingChat && currentTab !== 'notifications' && (
                     <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-yellow-50/50">
                         <div className="text-8xl mb-4 opacity-20">💬</div>
                         <h2 className="text-2xl font-black opacity-40">Select a chat to start</h2>
@@ -2260,6 +2267,29 @@ const App: React.FC = () => {
                             userCoins={user.coins}
                             onDeductCoins={handleDeductCoins}
                             products={allProducts}
+                        />
+                    </div>
+                )}
+                {activeBuildingChat && (
+                    <div className="absolute inset-0 w-full h-full z-20">
+                        <BuildingChatRoom
+                            building={activeBuildingChat}
+                            contact={contacts.find(c => c.id === activeBuildingChat.managerId) || contacts[0]}
+                            currentUser={user}
+                            allContacts={contacts}
+                            messages={allMessages[activeBuildingChat.managerId] || []}
+                            isTyping={typingStatus[activeBuildingChat.managerId] || false}
+                            onSendMessage={(text) => handleUserSendMessage(text, 'text', undefined, undefined, activeBuildingChat.managerId)}
+                            onBack={() => {
+                                setActiveBuildingChat(null);
+                                setIsToonMapOpen(true);
+                            }}
+                            buildings={buildings}
+                            setBuildings={setBuildings}
+                            language={language}
+                            onUpdateContactEnergy={(contactId, energy) => {
+                                setContacts(prev => prev.map(c => c.id === contactId ? { ...c, energy, lastEnergyUpdate: Date.now() } : c));
+                            }}
                         />
                     </div>
                 )}
@@ -2478,6 +2508,7 @@ const App: React.FC = () => {
                         <ToonMap
                             contacts={contacts}
                             scheduleVersion={scheduleVersion}
+                            onOpenBuildingChat={handleOpenBuildingChat}
                             onUpdateContactCoins={(contactId, coins) => {
                                 setContacts(prev => prev.map(c => c.id === contactId ? { ...c, coins } : c));
                             }}

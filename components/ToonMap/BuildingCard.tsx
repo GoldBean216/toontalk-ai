@@ -20,6 +20,7 @@ interface BuildingCardProps {
     onOpenMall?: () => void;
     onOpenSkillMall?: () => void;
     userId?: string;
+    onOpenBuildingChat?: (building: MapBuilding) => void;
 }
 
 export const BuildingCard: React.FC<BuildingCardProps> = ({
@@ -33,6 +34,7 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
     onOpenMall,
     onOpenSkillMall,
     userId,
+    onOpenBuildingChat,
 }) => {
     const isChinese = language === "简体中文";
     const isJapanese = language === "日本語";
@@ -75,14 +77,12 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
 
     const [editManagerId, setEditManagerId] = useState<string | null>(selectedBuilding.managerId || null);
     const [editBasicFunction, setEditBasicFunction] = useState(selectedBuilding.basicFunction || "");
-    const [editFrequency, setEditFrequency] = useState(selectedBuilding.generationFrequency || 10);
 
     useEffect(() => {
         setEditManagerId(selectedBuilding.managerId || null);
         setEditBasicFunction(selectedBuilding.basicFunction || "");
-        setEditFrequency(selectedBuilding.generationFrequency || 10);
         setIsEditing(false); // Reset edit mode when switching buildings
-    }, [selectedBuilding.id, selectedBuilding.managerId, selectedBuilding.basicFunction, selectedBuilding.generationFrequency]);
+    }, [selectedBuilding.id, selectedBuilding.managerId, selectedBuilding.basicFunction]);
 
     // Local state for selected content (inline modal)
     const [selectedContent, setSelectedContent] = useState<MapBuildingContent | null>(null);
@@ -109,17 +109,12 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
     };
 
     const handleSaveAttributes = async () => {
-        if (editFrequency < 5) {
-            alert(isChinese ? "产出频率不能低于5分钟！" : "Production frequency cannot be less than 5 minutes!");
-            return;
-        }
         setIsSaving(true);
         const updatedBuilding: MapBuilding = {
             ...selectedBuilding,
             isActive: true, // Mark as active on first save
             managerId: editManagerId,
             basicFunction: editBasicFunction,
-            generationFrequency: editFrequency,
             health: selectedBuilding.isActive ? selectedBuilding.health : 100 // Initialize health if first time
         };
 
@@ -145,6 +140,12 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
         setTimeout(() => {
             setShowSuccess(false);
             setIsEditing(false); // Close settings panel
+            setSelectedBuilding(null); // Close the detail card modal
+            
+            // Navigate to building chat room if manager is assigned
+            if (editManagerId && onOpenBuildingChat) {
+                onOpenBuildingChat(updatedBuilding);
+            }
         }, 800);
     };
 
@@ -244,7 +245,7 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
         >
             <div 
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white border-4 border-black rounded-3xl w-full max-w-5xl flex flex-col shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden max-h-[90vh] relative"
+                className="bg-white border-4 border-black rounded-3xl w-full max-w-lg flex flex-col shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden max-h-[90vh] relative"
             >
                 {/* Close button */}
                 <button 
@@ -291,7 +292,7 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative min-h-[500px]">
+                <div className="flex flex-col flex-1 overflow-hidden relative min-h-[500px]">
                     {/* Activation Overlay */}
                     {!selectedBuilding.isActive && !isEditing && (
                         <div className="absolute inset-0 z-40 bg-white/90 backdrop-blur-[2px] flex flex-col items-center justify-center p-8 text-center animate-fadeIn">
@@ -316,7 +317,7 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
                     )}
 
                     {/* Left Column: Attributes (Settings or Details) */}
-                    <div className="w-full md:w-1/3 border-r-0 md:border-r-4 border-b-4 md:border-b-0 border-black bg-indigo-50/40 p-6 overflow-y-auto flex flex-col gap-6">
+                    <div className="w-full bg-indigo-50/40 p-6 overflow-y-auto flex flex-col gap-6">
                         {isEditing ? (
                             <>
                                 {/* Settings View */}
@@ -384,23 +385,6 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
                                      )}
                                  </section>
 
-                                <section>
-                                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2 ml-1">
-                                        {isChinese ? "产出频率 (分钟)" : isJapanese ? "生成頻度 (分)" : "Frequency (Minutes)"}
-                                    </label>
-                                    <div className="relative">
-                                        <input 
-                                            type="number"
-                                            min={1}
-                                            max={1440}
-                                            value={editFrequency}
-                                            onChange={(e) => setEditFrequency(Number(e.target.value))}
-                                            className="w-full bg-white border-2 border-black rounded-xl p-3 text-sm font-bold shadow-[3px_3px_0px_rgba(0,0,0,1)] focus:outline-none"
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase">min</span>
-                                    </div>
-                                </section>
-
                                 <div className="flex gap-3 mt-auto">
                                     {!selectedBuilding.isActive && (
                                         <button 
@@ -417,7 +401,6 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
                                                 // Revert local state
                                                 setEditManagerId(selectedBuilding.managerId || null);
                                                 setEditBasicFunction(selectedBuilding.basicFunction || "");
-                                                setEditFrequency(selectedBuilding.generationFrequency || 10);
                                             }}
                                             className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black py-4 rounded-2xl border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all uppercase text-sm"
                                         >
@@ -474,21 +457,7 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
                                     </div>
                                 </div>
 
-                                {/* Progress Bar & Status */}
-                                <section className="space-y-3">
-                                    <div className="flex justify-between items-end px-1">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                                            {isChinese ? "产出进度" : "Production Progress"}
-                                        </label>
-                                        <span className="text-[10px] font-black text-indigo-600 animate-pulse">
-                                            {isChinese ? "正在运营..." : "Working..."}
-                                        </span>
-                                    </div>
-                                    <BuildingProgressBar 
-                                        lastGenTime={selectedBuilding.lastGenerationTime || 0}
-                                        frequency={selectedBuilding.generationFrequency || 10}
-                                    />
-                                </section>
+
 
                                 {/* Equipped Skill */}
                                 <section className="bg-white border-2 border-black rounded-2xl p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
@@ -505,15 +474,7 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
                                     </div>
                                 </section>
 
-                                {/* Frequency Value Display */}
-                                <section className="flex justify-between items-center bg-white border-2 border-black rounded-2xl p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                                        {isChinese ? "产出频率" : "Frequency"}
-                                    </span>
-                                    <span className="font-black text-slate-900">
-                                        {selectedBuilding.generationFrequency} <span className="text-[10px] text-slate-400 uppercase ml-0.5">min</span>
-                                    </span>
-                                </section>
+
 
                                 <button 
                                     onClick={() => setIsEditing(true)}
@@ -522,71 +483,6 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
                                     {isChinese ? "设置" : "Settings"}
                                 </button>
                             </>
-                        )}
-                    </div>
-
-                    {/* Right Column: Content Grid */}
-                    <div className="w-full md:w-2/3 bg-white p-6 overflow-y-auto flex flex-col">
-                        <h4 className="font-black text-xs text-slate-800 border-b-2 border-black pb-2 mb-6 uppercase tracking-wider flex justify-between items-center">
-                            <span>{isChinese ? "产出内容展示" : isJapanese ? "生成されたコンテンツ" : "Generated Content"}</span>
-                            <span className="bg-slate-100 px-2 py-0.5 rounded-full text-[9px] text-slate-500">
-                                {(selectedBuilding.generatedContents || []).length} ITEMS
-                            </span>
-                        </h4>
-                        
-                        {!selectedBuilding.generatedContents || selectedBuilding.generatedContents.length === 0 ? (
-                            <div className="flex-1 flex flex-col items-center justify-center py-20 text-slate-400 font-bold italic border-4 border-dashed border-slate-100 rounded-[2rem] bg-slate-50/50">
-                                <span className="text-6xl mb-4 grayscale opacity-50">📭</span>
-                                <p className="text-sm uppercase tracking-widest">
-                                    {isChinese ? "暂无产出内容" : isJapanese ? "コンテンツはまだありません" : "No content generated yet"}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                {selectedBuilding.generatedContents.map((content, idx) => {
-                                    const author = contacts.find(c => c.id === content.authorId);
-                                    const itemIcon = getBuildingItemIcon(selectedBuilding);
-                                    return (
-                                        <div 
-                                            key={content.id}
-                                            onClick={() => setSelectedContent(content)}
-                                            className="bg-white border-2 border-black rounded-2xl p-4 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex flex-col items-center justify-between aspect-square group relative overflow-hidden"
-                                        >
-                                            {/* Top left Index */}
-                                            <div className="absolute top-2 left-2 text-[9px] font-black text-slate-400 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded-md">
-                                                #{idx + 1}
-                                            </div>
-
-                                            {/* Center Icon */}
-                                            <div className="flex-1 flex flex-col items-center justify-center mt-3">
-                                                <div className="w-14 h-14 rounded-2xl bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-3xl mb-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] group-hover:scale-110 group-hover:bg-indigo-100 transition-all duration-300">
-                                                    {itemIcon.emoji}
-                                                </div>
-                                                <div className="text-xs font-black text-slate-800 text-center">
-                                                    {itemIcon.label}
-                                                </div>
-                                            </div>
-
-                                            {/* Bottom Author & Reactions */}
-                                            <div className="w-full pt-2 border-t border-dashed border-slate-200 flex flex-col gap-1">
-                                                <div className="flex items-center justify-between text-[9px] font-black">
-                                                    <span className="text-slate-500 truncate max-w-[60%]">
-                                                        {author?.name || "AI Agent"}
-                                                    </span>
-                                                    <div className="flex gap-2 shrink-0">
-                                                        <span className="text-green-600 flex items-center gap-0.5">
-                                                            👍{content.likes}
-                                                        </span>
-                                                        <span className="text-red-500 flex items-center gap-0.5">
-                                                            👎{content.dislikes}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
                         )}
                     </div>
                 </div>
@@ -649,43 +545,4 @@ export const BuildingCard: React.FC<BuildingCardProps> = ({
     );
 };
 
-const BuildingProgressBar: React.FC<{ lastGenTime: number; frequency: number }> = ({ lastGenTime, frequency }) => {
-    const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-        if (!lastGenTime) {
-            setProgress(0);
-            return;
-        }
-
-        const updateProgress = () => {
-            const now = Date.now();
-            const elapsed = now - lastGenTime;
-            const duration = frequency * 60 * 1000; // frequency in real minutes
-            const nextProgress = Math.min(100, (elapsed / duration) * 100);
-            setProgress(nextProgress);
-        };
-
-        updateProgress();
-        const interval = setInterval(updateProgress, 1000);
-        return () => clearInterval(interval);
-    }, [lastGenTime, frequency]);
-
-    return (
-        <div className="h-4 w-full bg-slate-100 border-2 border-black rounded-full overflow-hidden relative shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]">
-            <div 
-                className="h-full bg-indigo-500 transition-all duration-1000 ease-linear"
-                style={{ width: `${progress}%` }}
-            />
-            {/* Gloss effect */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-white/20" />
-            
-            {/* Hatch Marks */}
-            <div className="absolute inset-0 flex justify-between px-2 pointer-events-none opacity-20">
-                {[...Array(10)].map((_, i) => (
-                    <div key={i} className="w-0.5 h-full bg-black" />
-                ))}
-            </div>
-        </div>
-    );
-};
