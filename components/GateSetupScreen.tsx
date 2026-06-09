@@ -12,7 +12,7 @@ const PROVIDER_OPTIONS: { value: AiProvider; label: string; icon: string; defaul
   { value: 'openai',    label: 'OpenAI',                    icon: '⚡', defaultModel: 'gpt-4o', defaultBaseUrl: 'https://api.openai.com/v1' },
   { value: 'deepseek',  label: 'DeepSeek',                  icon: '🐳', defaultModel: 'deepseek-chat', defaultBaseUrl: 'https://api.deepseek.com' },
   { value: 'anthropic', label: 'Anthropic Claude',          icon: '🧠', defaultModel: 'claude-3-5-sonnet-20241022', defaultBaseUrl: 'https://api.anthropic.com/v1' },
-  { value: 'ollama',    label: 'Ollama (Local)',            icon: '🦙', defaultModel: 'llama3.1', defaultBaseUrl: 'http://127.0.0.1:11434' },
+  { value: 'ollama',    label: 'Ollama (Local)',            icon: '🦙', defaultModel: 'llama3.1', defaultBaseUrl: 'http://localhost:11434/v1' },
   { value: 'custom',    label: 'Custom (OpenAI Compatible)', icon: '⚙️', defaultModel: '', defaultBaseUrl: '' },
 ];
 
@@ -36,6 +36,7 @@ export const GateSetupScreen: React.FC<GateSetupScreenProps> = ({ onUnlockComple
       setModel(matched.defaultModel);
       setBaseUrl(matched.defaultBaseUrl);
     }
+    setApiKey('');
   };
 
   const playUnlockSound = () => {

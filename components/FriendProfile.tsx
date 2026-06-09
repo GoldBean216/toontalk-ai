@@ -766,7 +766,19 @@ export const FriendProfile: React.FC<FriendProfileProps> = ({
                                             const val = e.target.value as AiProvider;
                                             setProvider(val);
                                             const opt = PROVIDER_OPTIONS.find(o => o.value === val);
-                                            if (opt) setModel(opt.defaultModel);
+                                            if (opt) {
+                                                setModel(opt.defaultModel);
+                                                const defaultBases: Record<string, string> = {
+                                                    gemini: 'https://generativelanguage.googleapis.com',
+                                                    openai: 'https://api.openai.com/v1',
+                                                    deepseek: 'https://api.deepseek.com',
+                                                    anthropic: 'https://api.anthropic.com/v1',
+                                                    ollama: 'http://localhost:11434/v1',
+                                                    custom: '',
+                                                };
+                                                setBaseUrl(defaultBases[val] || '');
+                                            }
+                                            setApiKey('');
                                         }}
                                         className="w-full bg-white border-2 border-black rounded-lg p-2 font-bold focus:outline-none focus:ring-2 focus:ring-purple-400"
                                     >
@@ -893,7 +905,19 @@ export const FriendProfile: React.FC<FriendProfileProps> = ({
                                                     const val = e.target.value as AiProvider;
                                                     setLittleBrainProvider(val);
                                                     const opt = PROVIDER_OPTIONS.find(o => o.value === val);
-                                                    if (opt) setLittleBrainModel(val === 'gemini' ? 'gemini-2.5-flash' : opt.defaultModel);
+                                                    if (opt) {
+                                                        setLittleBrainModel(val === 'gemini' ? 'gemini-2.5-flash' : opt.defaultModel);
+                                                        const defaultBases: Record<string, string> = {
+                                                            gemini: 'https://generativelanguage.googleapis.com',
+                                                            openai: 'https://api.openai.com/v1',
+                                                            deepseek: 'https://api.deepseek.com',
+                                                            anthropic: 'https://api.anthropic.com/v1',
+                                                            ollama: 'http://localhost:11434/v1',
+                                                            custom: '',
+                                                        };
+                                                        setLittleBrainBaseUrl(defaultBases[val] || '');
+                                                    }
+                                                    setLittleBrainApiKey('');
                                                 }}
                                                 className="w-full bg-white border-2 border-black rounded-lg p-2 font-bold focus:outline-none focus:ring-2 focus:ring-purple-400"
                                             >
@@ -1026,6 +1050,13 @@ export const FriendProfile: React.FC<FriendProfileProps> = ({
                                             setTtsProvider(val);
                                             if (val === 'openai') setTtsModel('tts-1');
                                             else if (val === 'gemini') setTtsModel('');
+                                            const defaultBases: Record<string, string> = {
+                                                gemini: 'https://generativelanguage.googleapis.com',
+                                                openai: 'https://api.openai.com/v1',
+                                                custom: '',
+                                            };
+                                            setTtsBaseUrl(defaultBases[val] || '');
+                                            setTtsApiKey('');
                                         }}
                                         className="w-full bg-white border-2 border-black rounded-lg p-2 font-bold focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     >

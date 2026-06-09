@@ -554,7 +554,19 @@ export const Profile: React.FC<ProfileProps> = ({
                     const val = e.target.value as AiProvider;
                     setProvider(val);
                     const opt = PROVIDER_OPTIONS.find(o => o.value === val);
-                    if (opt) setModel(opt.defaultModel);
+                    if (opt) {
+                      setModel(opt.defaultModel);
+                      const defaultBases: Record<string, string> = {
+                        gemini: 'https://generativelanguage.googleapis.com',
+                        openai: 'https://api.openai.com/v1',
+                        deepseek: 'https://api.deepseek.com',
+                        anthropic: 'https://api.anthropic.com/v1',
+                        ollama: 'http://localhost:11434/v1',
+                        custom: '',
+                      };
+                      setBaseUrl(defaultBases[val] || '');
+                    }
+                    setApiKey('');
                   }}
                   className="w-full bg-white border-2 border-black rounded-xl p-2.5 font-bold text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
                 >
@@ -681,7 +693,19 @@ export const Profile: React.FC<ProfileProps> = ({
                           const val = e.target.value as AiProvider;
                           setLittleBrainProvider(val);
                           const opt = PROVIDER_OPTIONS.find(o => o.value === val);
-                          if (opt) setLittleBrainModel(val === 'gemini' ? 'gemini-2.5-flash' : opt.defaultModel);
+                          if (opt) {
+                            setLittleBrainModel(val === 'gemini' ? 'gemini-2.5-flash' : opt.defaultModel);
+                            const defaultBases: Record<string, string> = {
+                              gemini: 'https://generativelanguage.googleapis.com',
+                              openai: 'https://api.openai.com/v1',
+                              deepseek: 'https://api.deepseek.com',
+                              anthropic: 'https://api.anthropic.com/v1',
+                              ollama: 'http://localhost:11434/v1',
+                              custom: '',
+                            };
+                            setLittleBrainBaseUrl(defaultBases[val] || '');
+                          }
+                          setLittleBrainApiKey('');
                         }}
                         className="w-full bg-white border-2 border-black rounded-xl p-2 font-bold text-xs focus:outline-none"
                       >

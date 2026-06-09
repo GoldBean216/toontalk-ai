@@ -241,6 +241,7 @@ export const AddContact: React.FC<AddContactProps> = ({ onBack, onSave, userCoin
     setProvider(val);
     setModel(info.defaultModel);
     setBaseUrl('');
+    setApiKey('');
   };
 
   return (
