@@ -356,6 +356,15 @@ try {
 
 export const localDb = db;
 
+function toSqlValue(val: any): any {
+    if (val === undefined) return null;
+    if (typeof val === 'boolean') return val ? 1 : 0;
+    if (typeof val === 'object' && val !== null) {
+        return JSON.stringify(val);
+    }
+    return val;
+}
+
 class MockQueryBuilder {
     tableName: string;
     _select: string;
@@ -418,33 +427,33 @@ class MockQueryBuilder {
                 
                 Object.keys(this._match).forEach(k => {
                     conditions.push(`${k} = ?`);
-                    params.push(this._match[k]);
+                    params.push(toSqlValue(this._match[k]));
                 });
                 this._gt.forEach(g => {
                     conditions.push(`${g.column} > ?`);
-                    params.push(g.value);
+                    params.push(toSqlValue(g.value));
                 });
                 this._lt.forEach(l => {
                     conditions.push(`${l.column} < ?`);
-                    params.push(l.value);
+                    params.push(toSqlValue(l.value));
                 });
                 this._gte.forEach(g => {
                     conditions.push(`${g.column} >= ?`);
-                    params.push(g.value);
+                    params.push(toSqlValue(g.value));
                 });
                 this._lte.forEach(l => {
                     conditions.push(`${l.column} <= ?`);
-                    params.push(l.value);
+                    params.push(toSqlValue(l.value));
                 });
                 this._neq.forEach(n => {
                     conditions.push(`${n.column} != ?`);
-                    params.push(n.value);
+                    params.push(toSqlValue(n.value));
                 });
                 this._in.forEach(i => {
                     if (i.values.length > 0) {
                         const placeholders = i.values.map(() => '?').join(', ');
                         conditions.push(`${i.column} IN (${placeholders})`);
-                        params.push(...i.values);
+                        params.push(...i.values.map(toSqlValue));
                     } else {
                         conditions.push('1 = 0');
                     }
@@ -493,7 +502,7 @@ class MockQueryBuilder {
                         item.id = crypto.randomUUID();
                     }
                     const keys = Object.keys(item);
-                    const values = keys.map(k => typeof item[k] === 'object' && item[k] !== null ? JSON.stringify(item[k]) : item[k]);
+                    const values = keys.map(k => toSqlValue(item[k]));
                     
                     const placeholders = keys.map(() => '?').join(', ');
                     const query = `INSERT ${this._action === 'upsert' ? 'OR REPLACE' : ''} INTO ${this.tableName} (${keys.join(', ')}) VALUES (${placeholders})`;
@@ -514,14 +523,14 @@ class MockQueryBuilder {
             }
             else if (this._action === 'update') {
                 const keys = Object.keys(this._data);
-                const values = keys.map(k => typeof this._data[k] === 'object' && this._data[k] !== null ? JSON.stringify(this._data[k]) : this._data[k]);
+                const values = keys.map(k => toSqlValue(this._data[k]));
                 
                 let query = `UPDATE ${this.tableName} SET ` + keys.map(k => `${k} = ?`).join(', ');
                 
                 let conditions: string[] = [];
                 Object.keys(this._match).forEach(k => {
                     conditions.push(`${k} = ?`);
-                    values.push(this._match[k]);
+                    values.push(toSqlValue(this._match[k]));
                 });
                 
                 if (conditions.length > 0) {
@@ -537,7 +546,7 @@ class MockQueryBuilder {
                 let params: any[] = [];
                 Object.keys(this._match).forEach(k => {
                     conditions.push(`${k} = ?`);
-                    params.push(this._match[k]);
+                    params.push(toSqlValue(this._match[k]));
                 });
                 
                 if (conditions.length > 0) {
