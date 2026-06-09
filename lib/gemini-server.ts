@@ -792,7 +792,30 @@ export const serverTestConnection = async (
     const text = await callBigBrainRaw(prompt, brain, 50);
     return text?.trim() || 'OK';
   } catch (error: any) {
-    throw new Error(error.message || 'Connection test failed');
+    let errMsg = error.message || 'Connection test failed';
+    if (provider === 'ollama') {
+      const isModelNotFound = errMsg.toLowerCase().includes('not found') && errMsg.toLowerCase().includes('model');
+      if (isModelNotFound) {
+        const baseUrl = apiBaseUrl || 'http://localhost:11434/v1';
+        let availableModels: string[] = [];
+        try {
+          const res = await fetch(`${baseUrl.replace(/\/$/, '')}/models`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && Array.isArray(data.data)) {
+              availableModels = data.data.map((m: any) => m.id);
+            }
+          }
+        } catch (_) {}
+        
+        if (availableModels.length > 0) {
+          throw new Error(`Ollama 连接成功，但本地未找到模型 '${model}'。本地可用模型: ${availableModels.join(', ')}。请在命令行运行 'ollama pull ${model}' 下载。`);
+        } else {
+          throw new Error(`Ollama 连接成功，但本地未找到模型 '${model}'。请在命令行运行 'ollama pull ${model}' 下载。`);
+        }
+      }
+    }
+    throw new Error(errMsg);
   }
 };
 
